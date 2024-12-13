@@ -1,0 +1,10 @@
+// Minimum value computation
+    module min(
+        input logic [15:0] a,
+        input logic [15:0] b,
+        input logic [15:0] c,
+        input logic [15:0] d,
+        output logic [15:0] result
+    );
+        assign result = (a < b && a < c && a < d) ? a : (b < c && b < d) ? b : (c < d) ? c : d;
+    endmodule
