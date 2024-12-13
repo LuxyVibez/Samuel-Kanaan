@@ -1,0 +1,4 @@
+ // Absolute value
+    module abs(input logic [15:0] a, output logic [15:0] result);
+        assign result = (a[15]) ? (~a + 1) : a;
+    endmodule
