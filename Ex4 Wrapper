@@ -1,0 +1,77 @@
+/* Starter code for ex4_wrapper.v
+Samuel Kanaan
+Exam 3
+This is the ex4 wrapper 
+12/13/2024
+*/
+
+module ex4_wrapper (
+    input logic clk,
+    input logic reset,
+    input logic start,
+    input logic [15:0] in1,
+    input logic [15:0] in2,
+    output logic done,
+    output logic [15:0] output1
+);
+
+    // Internal signals
+    logic [5:0] state;
+    logic [15:0] x, y;
+    logic [5:0] idx;
+    logic [15:0] memory [0:63]; // 64 words of 16-bit memory
+    logic [15:0] temp_output;
+
+    // State encoding
+    localparam IDLE = 0, INIT = 1, CALC_X = 2, CALC_Y = 3, LOOP = 4, DONE = 5;
+
+    // FSM
+always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= IDLE;
+            done <= 0;
+            output1 <= 0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    if (start) state <= INIT;
+                end
+                INIT: begin
+                    mem_init_rand(memory, 64, 6);
+                    memory[5] <= 42; // Address 5 is set to 42
+                    state <= CALC_X;
+                end
+                CALC_X: begin
+                    x <= mem_instances(memory, 64, abs(in1));
+                    if (x < 10)
+                        x <= 10;
+                    else if (x >= 20)
+                        x <= 19;
+                    state <= CALC_Y;
+                end
+                CALC_Y: begin
+                  y <= abs(in2);
+                    if (y < 6)
+                        y <= 6;
+                    else if (y >= 9)
+                        y <= 8;
+                    state <= LOOP;
+                end
+                LOOP: begin
+                    idx <= abs(rand()) % 10;
+                    while (idx < x) begin
+                        for (int i = 1; i < y; i++) begin
+                            memory[i + idx] <= nib_swap(memory[idx]);
+                            temp_output <= temp_output + min(memory[i], 0 - i - idx, abs(in1), in2);
+                        end
+                        idx <= idx + 2;
+                    end
+                    state <= DONE;
+                end
+                DONE: begin
+                    done <= 1;
+                    output1 <= temp_output;
+                end
+            endcase
+        end
+    end
