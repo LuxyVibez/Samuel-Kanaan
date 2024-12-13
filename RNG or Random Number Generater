@@ -1,0 +1,6 @@
+  // Random number generation
+    module rand(output logic [15:0] result);
+        always_comb begin
+            result = $random;
+        end
+    endmodule
