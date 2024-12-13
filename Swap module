@@ -1,0 +1,3 @@
+module nib_swap(input logic [15:0] a, output logic [15:0] result);
+        assign result = {a[3:0], a[11:4], a[15:12]};
+    endmodule
